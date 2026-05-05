@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>創業44周年 脚やせ未来診断</title>
+<title>脚やせAIカウンセリング | 脚が変われば、人生の景色が変わる</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -90,35 +90,36 @@ footer { text-align: center; padding: 32px 16px; font-size: 12px; color: #bbb; }
 
 <nav>
   <span class="nav-title">創業44周年 脚やせ診断</span>
-  <button class="nav-btn">無料体験を予約</button>
+  <button class="nav-btn">特別体験コースを予約</button>
 </nav>
 
 <header>
-  <p class="header-label">FOUNDED 44 YEARS AGO</p>
+  <p class="header-label">44年の知見で、あなたの「今」を解き明かす</p>
   <h1 class="header-title">脚が変われば、人生が変わる。</h1>
-  <p class="header-sub">あなたの生活習慣から、10年後の脚を予測します。</p>
+  <p class="header-sub">仕事、家事、日々のストレス。それらはすべて「脚」に現れます。</p>
+  <p class="header-sub">今のあなたのストレスが、10年後の身体にどう影響するか、AIが診断します。</p>
 </header>
 
 <main>
   <div class="card">
     <div class="panel-left">
-      <p class="section-title">🔍 あなたの情報を教えてください</p>
+      <p class="section-title">あなたの情報を教えてください 🔍</p>
 
       <div class="field">
-        <label>生活習慣</label>
+        <label>現在のライフスタイル</label>
         <select id="lifestyle">
           <option value="0">デスクワーク中心</option>
           <option value="1">立ち仕事中心</option>
-          <option value="2">家事・育児中心</option>
+          <option value="2">家事・育児で動き回っている</option>
         </select>
       </div>
 
       <div class="field">
-        <label>主なお悩み</label>
+        <label>一番の悩み</label>
         <select id="worry">
-          <option value="0">セルライト・横の張り</option>
-          <option value="1">冷えが酷い</option>
-          <option value="2">脚だけ痩せない</option>
+          <option value="0">太もものセルライト・横の張り</option>
+          <option value="1">冷えが酷く、何をしても温まらない</option>
+          <option value="2">全体は痩せたのに脚だけ残っている</option>
         </select>
       </div>
 
@@ -131,7 +132,7 @@ footer { text-align: center; padding: 32px 16px; font-size: 12px; color: #bbb; }
         <div class="range-hints"><span>穏やか</span><span>限界</span></div>
       </div>
 
-      <button class="diagnose-btn" onclick="diagnose()">✨ 10年後の未来を診断する</button>
+      <button class="diagnose-btn" onclick="diagnose()">AI未来カウンセリングを開始する ✨</button>
     </div>
 
     <div class="panel-right" id="rightPanel">
@@ -144,7 +145,7 @@ footer { text-align: center; padding: 32px 16px; font-size: 12px; color: #bbb; }
   </div>
 </main>
 
-<footer>© 創業44周年 脚やせ専門サロン</footer>
+<footer>© P.U SERVICE CO.,LTD. ALL RIGHTS RESERVED. </footer>
 
 <script>
 const stressLabels = ["穏やか", "低い", "普通", "高い", "限界"];
@@ -234,8 +235,8 @@ function diagnose() {
         <div class="result-vision">${data.vision}</div>
         <div class="result-message">💬 ${data.message}</div>
         <div class="result-cta">
-          <p>この結果を改善するには？</p>
-          <button class="cta-btn">無料カウンセリングを予約</button>
+          <p>自分を後回しにするのは、卒業。</p>
+          <button class="cta-btn">特別体験コースを予約する</button>
         </div>
       </div>`;
   }, 1400);
