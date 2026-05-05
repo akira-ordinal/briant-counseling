@@ -1,344 +1,245 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創業44周年 脚やせ未来診断</title>
-    <!-- Tailwind CSS (スタイリング用) -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
-    <!-- Babel (JSXをブラウザで動かすため) -->
-    <script src="https://unpkg.com"></script>
-    <!-- Chart.js -->
-    <script src="https://jsdelivr.net"></script>
-    <style>
-        @import url('https://googleapis.com');
-        .font-serif { font-family: 'Noto Serif JP', serif; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>創業44周年 脚やせ未来診断</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans JP', sans-serif; background: #fdfbf7; color: #3d2e1f; min-height: 100vh; }
+
+nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 24px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  position: sticky; top: 0; z-index: 10;
+}
+.nav-title { font-family: 'Noto Serif JP', serif; font-weight: 700; color: #1a2a40; font-size: 15px; }
+.nav-btn {
+  background: #b5945d; color: white; border: none; padding: 8px 18px;
+  border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+header { text-align: center; padding: 40px 16px 24px; }
+.header-label { font-size: 11px; color: #b5945d; font-weight: 700; letter-spacing: 0.15em; margin-bottom: 8px; }
+.header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(20px, 5vw, 30px); font-weight: 700; color: #1a2a40; }
+.header-sub { margin-top: 8px; font-size: 13px; color: #888; }
+
+main { max-width: 860px; margin: 0 auto; padding: 0 16px 48px; }
+.card {
+  background: white; border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid #e1d4bc; overflow: hidden;
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+@media(max-width: 640px) { .card { grid-template-columns: 1fr; } }
+
+.panel-left { padding: 32px; }
+.panel-right {
+  background: #f7f3ec; padding: 32px; border-left: 1px solid #e1d4bc;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px;
+}
+@media(max-width: 640px) { .panel-right { border-left: none; border-top: 1px solid #e1d4bc; } }
+
+.section-title { font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 700; color: #1a2a40; margin-bottom: 24px; }
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 11px; font-weight: 700; color: #888; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.field select {
+  width: 100%; padding: 12px 14px; border: 1px solid #e1d4bc;
+  border-radius: 12px; background: #fdfbf7; font-size: 14px; color: #3d2e1f;
+  font-family: 'Noto Sans JP', sans-serif; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.stress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.stress-header span:first-child { font-size: 11px; font-weight: 700; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
+.stress-value { color: #b5945d; font-size: 14px; font-weight: 700; }
+input[type=range] { width: 100%; accent-color: #b5945d; }
+.range-hints { display: flex; justify-content: space-between; font-size: 11px; color: #bbb; margin-top: 4px; }
+
+.diagnose-btn {
+  width: 100%; background: #1a2a40; color: white; border: none;
+  padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Noto Sans JP', sans-serif;
+  transition: background 0.2s; margin-top: 8px;
+}
+.diagnose-btn:hover { background: #2a3a50; }
+
+.chart-title { text-align: center; font-size: 11px; color: #888; margin-bottom: 10px; }
+.chart-hint { text-align: center; font-size: 11px; color: #bbb; margin-top: 8px; }
+
+.result { width: 100%; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+.result-tag { font-size: 11px; font-weight: 700; color: #b5945d; margin-bottom: 10px; }
+.result-vision { background: white; border-radius: 14px; padding: 16px; border: 1px solid #e1d4bc; font-size: 13px; line-height: 1.8; color: #3d2e1f; margin-bottom: 12px; }
+.result-message { background: #1a2a40; color: white; border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.8; font-style: italic; margin-bottom: 16px; }
+.result-cta { text-align: center; }
+.result-cta p { font-size: 11px; color: #bbb; margin-bottom: 8px; }
+.cta-btn { background: #b5945d; color: white; border: none; padding: 10px 24px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; }
+
+.loader { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #888; font-size: 13px; }
+.spinner { width: 36px; height: 36px; border: 3px solid #e1d4bc; border-top-color: #b5945d; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+footer { text-align: center; padding: 32px 16px; font-size: 12px; color: #bbb; }
+</style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+<nav>
+  <span class="nav-title">創業44周年 脚やせ診断</span>
+  <button class="nav-btn">無料体験を予約</button>
+</nav>
 
-        // --- 診断データベース ---
-        const diagnosisDatabase = {
-            "0-0-1": {
-    "vision": "デスクワーク中心でストレスが低い今の状態は、巡りを改善する絶好のチャンスです。座りっぱなしによる圧迫を解き放つことで、10年後もセルライトのない美しいラインを維持できます。",
-    "message": "自分を大切にできている証拠ですね。その調子で、たまには立ち上がって脚も労わってあげましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
+<header>
+  <p class="header-label">FOUNDED 44 YEARS AGO</p>
+  <h1 class="header-title">脚が変われば、人生が変わる。</h1>
+  <p class="header-sub">あなたの生活習慣から、10年後の脚を予測します。</p>
+</header>
+
+<main>
+  <div class="card">
+    <div class="panel-left">
+      <p class="section-title">🔍 あなたの情報を教えてください</p>
+
+      <div class="field">
+        <label>生活習慣</label>
+        <select id="lifestyle">
+          <option value="0">デスクワーク中心</option>
+          <option value="1">立ち仕事中心</option>
+          <option value="2">家事・育児中心</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>主なお悩み</label>
+        <select id="worry">
+          <option value="0">セルライト・横の張り</option>
+          <option value="1">冷えが酷い</option>
+          <option value="2">脚だけ痩せない</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="stress-header">
+          <span>ストレス度</span>
+          <span class="stress-value" id="stressLabel">普通</span>
+        </div>
+        <input type="range" id="stress" min="1" max="5" value="3" oninput="updateStress()">
+        <div class="range-hints"><span>穏やか</span><span>限界</span></div>
+      </div>
+
+      <button class="diagnose-btn" onclick="diagnose()">✨ 10年後の未来を診断する</button>
+    </div>
+
+    <div class="panel-right" id="rightPanel">
+      <div style="width:100%">
+        <p class="chart-title">現代女性の脚悩みの変化</p>
+        <canvas id="radarChart" height="220"></canvas>
+        <p class="chart-hint">← 診断して10年後の未来を見る</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>© 創業44周年 脚やせ専門サロン</footer>
+
+<script>
+const stressLabels = ["穏やか", "低い", "普通", "高い", "限界"];
+
+function updateStress() {
+  document.getElementById('stressLabel').textContent = stressLabels[document.getElementById('stress').value - 1];
+}
+
+// レーダーチャート
+new Chart(document.getElementById('radarChart').getContext('2d'), {
+  type: 'radar',
+  data: {
+    labels: ['純粋な脂肪', '巡り', '芯の冷え', 'ストレス', 'デジタル疲労', '筋膜'],
+    datasets: [
+      { label: '1980年代', data: [90,60,40,20,5,30], borderColor:'#d6bfa0', backgroundColor:'rgba(214,191,160,0.15)', pointBackgroundColor:'#d6bfa0' },
+      { label: '現代', data: [50,90,95,90,100,80], borderColor:'#1a2a40', backgroundColor:'rgba(26,42,64,0.1)', pointBackgroundColor:'#1a2a40' }
+    ]
   },
-  "0-0-2": {
-    "vision": "少しの座りっぱなしの疲れがセルライトの種になりかけています。今から老廃物を流す習慣をつければ、10年後もスッキリとした太ももでいられますよ。",
-    "message": "無理なく自分のペースで過ごせていますね。少しのケアが未来の脚を大きく変えてくれますよ。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-0-3": {
-    "vision": "毎日のデスクワークで徐々に太もも周辺が固まり始めています。今しっかりほぐして巡りをリセットすれば、10年後の頑固な横張りは確実に防げます。",
-    "message": "毎日のお仕事お疲れ様です。頑張りすぎないで、少しだけ脚を伸ばす深呼吸の時間を作ってみてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-0-4": {
-    "vision": "高いストレスと長時間の座り仕事で、セルライトが非常に硬化しやすい状態です。プロの手で一度リセットし自律神経を整えれば、10年後も軽やかな脚を取り戻せます。",
-    "message": "毎日たくさん抱え込んでいませんか？脚の張りはあなたの頑張りの証。どうかご自身を甘やかす時間を作ってあげてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-0-5": {
-    "vision": "脳の疲労が脚を「鎧」のように硬くしています。今すぐ心身の緊張を解き放つケアを始めれば、10年後は見違えるほどしなやかで巡りの良い脚になりますよ。",
-    "message": "限界まで本当によく頑張りましたね。もう自分を後回しにするのは終わりにしましょう。私たちにゆだねてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-1-1": {
-    "vision": "ストレスは少ないものの、座り姿勢で鼠径部が圧迫され冷えが生じています。今のうちに血流を促すケアを取り入れれば、10年後もぽかぽかと温かい脚を保てます。",
-    "message": "穏やかな日々を過ごせていて素晴らしいです。冷えは万病の元、少しだけ温める意識を持ってみてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-1-2": {
-    "vision": "デスクワークでの血流低下が冷えを招いています。今の段階で芯から温めるアプローチをすれば、10年後も代謝の高いスッキリ脚が叶います。",
-    "message": "心に少しのゆとりがある今が、体質改善のベストタイミングです。温かい飲み物でホッと一息ついてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-1-3": {
-    "vision": "冷えが蓄積し、脂肪が燃えにくい状態になりつつあります。今のうちに熱を生み出す力を呼び覚ませば、10年後も冷え知らずの健康的な脚で過ごせます。",
-    "message": "毎日同じ姿勢で頑張っていると、脚先まで冷えてしまいますよね。足首を回すだけでも立派なケアですよ。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-1-4": {
-    "vision": "強いストレスで血管が収縮し、デスクワークの圧迫と相まって深刻な冷えを引き起こしています。リラクゼーションと共に深部を温めれば、10年後の未来は明るいです。",
-    "message": "緊張状態が続くと、体はどんどん冷えてしまいます。頑張り屋さんのあなたこそ、心まで温まる休息が必要です。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-1-5": {
-    "vision": "極度のストレスと冷えが合わさり、脚全体が氷のように固まっています。一刻も早く自律神経を休ませてあげることで、10年後は血色の良い柔らかな脚を取り戻せます。",
-    "message": "SOSのサイン、しっかり受け取りました。今は何も考えず、ただただ温かく包み込まれる時間を自分に許してあげてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-2-1": {
-    "vision": "座り癖による筋膜の癒着が脚痩せを阻害していますが、心身の状態は良好です。適切なほぐしを取り入れるだけで、10年後は全身のバランスが整った美脚になります。",
-    "message": "ダイエット成功、本当に素晴らしいです！あとは脚だけ。リラックスして最後の仕上げを楽しみましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-2-2": {
-    "vision": "デスクワークでの代償動作が脚の太さを残しています。正しい筋肉の使い方の癖をつければ、10年後もリバウンドのない理想の脚のラインを保てます。",
-    "message": "全体が痩せたのはあなたの努力の賜物です。残った脚のお悩みは、私たちプロに少しだけお手伝いさせてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-2-3": {
-    "vision": "座り姿勢の偏りが下半身の代謝だけを落としています。今から根本的な巡りの改善を行うことで、10年後は「脚が一番のチャームポイント」と言えるようになります。",
-    "message": "「脚だけ痩せない」という悔しさ、よくわかります。でも諦めないで。原因はあなたの努力不足ではなく、日常の癖にあります。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-2-4": {
-    "vision": "ストレスからくる無意識の力みが、脚だけに筋肉の張りを残しています。心の緊張を解き、癒着を剥がすことで、10年後はスラリとしたモデルのような脚が手に入ります。",
-    "message": "気を張る日々の中で、脚もキュッと力んで守ってくれているんです。もう大丈夫、少し肩の力を抜いてみましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "0-2-5": {
-    "vision": "過酷なストレスが自律神経を乱し、脚にだけ「守りの鎧」を作らせています。まずは深い休息をとることで体が安心し、10年後は嘘のようにすっきりした下半身になります。",
-    "message": "心が限界を迎えている時、体は必死にバランスを取ろうとします。今はダイエットをお休みして、自分を癒すことを最優先にしてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-0-1": {
-    "vision": "立ち仕事で重力に負けた水分が一時的に溜まっていますが、ストレスがないため回復は早いです。毎日のリセットケアで、10年後もむくみやセルライトのない脚でいられます。",
-    "message": "心穏やかに過ごせている今、お風呂上がりの少しのマッサージで脚は素直にスッキリしてくれますよ。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-0-2": {
-    "vision": "立ち仕事の疲労が蓄積し、夕方のむくみがセルライト化し始めています。今のうちに循環を整えれば、10年後もボコボコ感のないなめらかな脚を維持できます。",
-    "message": "毎日重力と戦いながら立っている脚に、感謝の気持ちを込めて優しくなでてあげてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-0-3": {
-    "vision": "長時間の立ち仕事と日常のストレスで、太ももの外側に負荷がかかり張りが出きています。今正しいケアをすれば、10年後も痛みのない美しいラインの脚で歩き続けられます。",
-    "message": "夕方の靴がきつくなる不快感、辛いですよね。今日もお疲れ様。脚を高くしてゆっくり休んでください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-0-4": {
-    "vision": "強いストレスと立ちっぱなしの疲労が重なり、老廃物がカチカチのセルライトになりかけています。プロの徹底的なデトックスで、10年後は軽やかに弾むような脚が手に入ります。",
-    "message": "心も体もパンパンに張っていませんか？その張りはあなたの頑張りそのもの。どうか私たちに軽くするお手伝いをさせてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-0-5": {
-    "vision": "極度のストレスと肉体疲労で、脚の筋肉が常に緊張し固太りのセルライトを作っています。まずは心身を究極にリラックスさせることで、10年後は見違えるほど柔らかな美脚になります。",
-    "message": "限界を超えて立ち続けているあなたへ。もう自分にムチを打つのはやめて、温かいベッドで泥のように眠る日を作ってください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-1-1": {
-    "vision": "立ち仕事でもストレスが少ないため、冷えは初期段階です。ポンプの役割をするふくらはぎのケアを日常に組み込めば、10年後も芯から温かい代謝の良い脚を保てます。",
-    "message": "ご自身のペースで働けていて素晴らしいですね。お風呂でしっかり脚を温めるだけで、さらに軽くなりますよ。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-1-2": {
-    "vision": "疲労による筋肉の硬直が血流を妨げ、冷えを生んでいます。今のうちに柔軟性を取り戻せば、10年後も冷房に負けない健康的な脚でいられます。",
-    "message": "立ち仕事での冷えは、脚からの「休ませて」というサインです。少しだけ足先を動かして血を巡らせてみましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-1-3": {
-    "vision": "夕方からの冷えとむくみが慢性化しつつあります。今、自らの力で熱を生み出せる体に改善すれば、10年後もむくみ知らずの軽やかな脚で生活できます。",
-    "message": "毎日立っていると、足先から冷気が上がってくるように感じますよね。温かい靴下で自分を優しく守ってあげてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-1-4": {
-    "vision": "高いストレスにより交感神経が優位になり、末端の血管が収縮して深刻な冷えを引き起こしています。深いリラクゼーションを取り入れることで、10年後は血流の豊かな温かい脚になります。",
-    "message": "気を張ったまま立ち続けるのは、想像以上の負担です。あなたの冷え切った脚も心も、温かく包み込んで溶かしてあげたいです。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-1-5": {
-    "vision": "心身の限界が自律神経をフリーズさせ、脚が氷のように冷たく硬直しています。今は休息と温熱ケアを最優先にすることで、10年後は生命力に溢れる柔らかな脚を取り戻せます。",
-    "message": "「もう無理かも」という心の声、我慢しないでください。あなたが一番大切にするべきなのは、他の誰でもなくあなた自身です。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-2-1": {
-    "vision": "立ち仕事特有の筋肉の使い方が脚の太さを残していますが、心身の状態は良いです。立ち姿勢の重心を整えるだけで、10年後はすらりとしたバランスの良い脚を手に入れられます。",
-    "message": "ダイエット大成功ですね！あと一歩、脚のバランスだけです。自分の体を褒めながら、リラックスして仕上げていきましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-2-2": {
-    "vision": "長時間の立ち仕事による筋膜の癒着が、脚だけ痩せない原因です。プロの技術で癒着を丁寧に剥がせば、10年後も引き締まった美しい下半身をキープできます。",
-    "message": "全体は痩せたのに脚だけ…もどかしいですよね。それはあなたの姿勢の頑張り癖が原因。私たちがしっかりリセットします。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-2-3": {
-    "vision": "立ち仕事の疲労で前ももやふくらはぎが張り、そこだけが太く残っています。筋肉の緊張を解くケアを始めれば、10年後はどんな服でも着こなせるスッキリ脚になります。",
-    "message": "毎日体重を支えてくれている脚の筋肉が「もっと頑張らなきゃ」と張っている状態です。優しくほぐして安心させてあげましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-2-4": {
-    "vision": "ストレスによる力みと立ちっぱなしの負担が、頑固な「鎧」のような筋肉の張りを作っています。心からのリラックスを経験することで、10年後は驚くほど華奢な脚に生まれ変わります。",
-    "message": "気を張って立っていると、脚にも無意識に力が入りますよね。もう戦わなくて大丈夫。力を抜くことから始めましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "1-2-5": {
-    "vision": "限界のストレス状態で立ち続けた結果、脚がガチガチに防衛反応を起こしています。すべてを休める時間を作れば体が安心し、10年後は理想通りのほっそりした脚に整います。",
-    "message": "これ以上頑張れと言われたら壊れてしまう、そんな状態ですね。ダイエットのことは忘れて、ただただ自分を労わる時間を作ってください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-0-1": {
-    "vision": "動き回る日々で疲労はありますが、ストレスが低いため循環は悪くありません。少しの自分時間でケアを加えれば、10年後も若々しいセルライトのない脚を保てます。",
-    "message": "ご家族のための時間の中でも、ご自身の心を大切にできていて素敵です。その延長で、脚のケア時間も作ってみてくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-0-2": {
-    "vision": "不規則な動きと軽いストレスから、骨盤周りに老廃物が溜まり始めています。今のうちにバランスを整えれば、10年後も横張りのないスッキリした下半身でいられます。",
-    "message": "毎日パタパタと動き回って、本当にお疲れ様です。少し立ち止まって、自分の脚を愛おしむ時間を持ってみてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-0-3": {
-    "vision": "家事や抱っこなどの片側重心の癖が、太ももの横張りとセルライトを作っています。今、プロのケアで歪みをリセットすれば、10年後も美しいボディラインで若々しくいられます。",
-    "message": "家族優先で自分のことは後回しになりがちですよね。でも、あなたが笑顔でいることが家族の幸せ。自分へのご褒美をあげてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-0-4": {
-    "vision": "高いストレスと終わりのない家事育児で、体が常に緊張状態になりセルライトが硬化しています。心と体を徹底的に解放すれば、10年後は身軽でしなやかな脚を取り戻せます。",
-    "message": "「私さえ我慢すれば」と、一人で抱え込んでいませんか？あなたの脚の張りは、言葉にできないSOSです。どうか私達に頼ってください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-0-5": {
-    "vision": "心身の限界を超えた状態での家事育児が、脚をガチガチの鎧に変えてしまっています。今は何よりも深い休息をとることで、10年後は信じられないほど軽やかな脚と笑顔を取り戻せます。",
-    "message": "毎日、息つく暇もないですね。涙が出るほど頑張っているあなたに、今はただ「休んでいいんだよ」と伝えたいです。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-1-1": {
-    "vision": "動き回ることで熱は生まれていますが、足元への意識が不足しがちです。日常のちょっとした温めケアを取り入れるだけで、10年後も冷えのない健康的な脚を保てます。",
-    "message": "穏やかな気持ちで家族と向き合えている証拠ですね。足首を冷やさない工夫をするだけで、もっと体が楽になりますよ。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-1-2": {
-    "vision": "忙しさからくるシャワー浴などが冷えの蓄積を招いています。今の段階で湯船に浸かるなどの温め習慣をつければ、10年後も代謝の良い巡る脚でいられます。",
-    "message": "自分の入浴時間はカラスの行水になっていませんか？たまにはゆっくりお湯に浸かって、自分だけの時間を楽しんでくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-1-3": {
-    "vision": "家事育児の疲労と自律神経の軽い乱れが、慢性的な冷えを引き起こしています。今根本的な体質改善を行えば、10年後も内側から輝くような温かい脚で過ごせます。",
-    "message": "バタバタと動き回っているのに、脚先は氷のように冷たい…それは体が疲れているサインです。少しペースダウンしてみましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-1-4": {
-    "vision": "高いストレスにより交感神経が働き続け、血流が内臓に集中するため極端な末端冷えが起きています。究極のリラックスで副交感神経を優位にすれば、10年後は温かく柔らかな脚を取り戻せます。",
-    "message": "24時間気を張っているお母さんの体は、ずっと戦闘モードです。温かい手で丁寧にケアして、安心させてあげたいです。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-1-5": {
-    "vision": "限界のストレス状態が自律神経を完全に乱し、脚が芯から凍え切っています。まずはすべてを手放して深い休息と温熱ケアをすれば、10年後は生命力にあふれた温かい体になります。",
-    "message": "自分を犠牲にしてまで頑張らないでください。あなたの心と体の冷えを溶かす場所が、ここにはあります。頼ってくださいね。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-2-1": {
-    "vision": "家事育児の不規則な姿勢が脚のラインを崩していますが、ストレスが低いため改善はスムーズです。正しい骨盤の位置を覚えれば、10年後も全体のバランスが取れた美脚でいられます。",
-    "message": "忙しい中でもダイエットを成功させたこと、本当に尊敬します！最後の仕上げはプロに任せて、リラックスしてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-2-2": {
-    "vision": "抱っこや家事の偏った筋肉の使い方が、特定の部位の太さを残しています。癒着を剥がして姿勢をリセットすれば、10年後もパンツスタイルが似合うスッキリ脚を保てます。",
-    "message": "「なぜ脚だけ？」と悩まないで。それはあなたが毎日家族のために動いている証拠の筋肉です。美しく整えていきましょう。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-2-3": {
-    "vision": "終わりのない家事の疲労と負担が脚の筋肉を張らせ、そこだけ痩せない状態を作っています。プロのケアで根本からほぐせば、10年後は全身がしなやかなモデルのような体型になります。",
-    "message": "自分の体に目を向ける余裕もない中、ここまで痩せたのはすごいことです。残った脚のお悩みは、一人で抱え込まずご相談ください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-2-4": {
-    "vision": "高いストレスと肉体疲労で、脚の筋肉が「これ以上痩せたら体を支えられない」と防衛反応を起こしています。心からの休息を与えれば、10年後は驚くほど華奢で真っ直ぐな脚になります。",
-    "message": "気を張り詰めた毎日に、体も必死に耐えています。もう戦わなくて大丈夫。力を抜いて、自分のためだけの時間を過ごしてください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
-  },
-  "2-2-5": {
-    "vision": "心身の限界からくる無意識の極度の力みが、脚を硬い鎧のように太く残しています。すべてを休めて体を安心させてあげることで、10年後は本来の美しいあなた自身の脚に生まれ変わります。",
-    "message": "限界まで頑張るお母さん、本当にお疲れ様です。今は結果を焦らず、ただただ自分を甘やかして大切にする日を作ってください。",
-    "imageUrl": "https://images.unsplash.com/photo-1544367567-0f2fcb046eeb?auto=format&fit=crop&w=800&q=80"
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { r: { ticks: { display: false }, pointLabels: { font: { size: 10 } } } },
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
   }
-        };
+});
 
-        const App = () => {
-            const [lifeStyleIdx, setLifeStyleIdx] = useState(0);
-            const [mainWorryIdx, setMainWorryIdx] = useState(0);
-            const [stressLevel, setStressLevel] = useState(3);
-            const [isLoading, setIsLoading] = useState(false);
-            const [result, setResult] = useState(null);
-            const chartRef = useRef(null);
+const db = {
+  "0-0-1":{vision:"デスクワーク中心でストレスが低い今の状態は、巡りを改善する絶好のチャンスです。座りっぱなしによる圧迫を解き放つことで、10年後もセルライトのない美しいラインを維持できます。",message:"自分を大切にできている証拠ですね。その調子で、たまには立ち上がって脚も労わってあげましょう。"},
+  "0-0-2":{vision:"少しの座りっぱなしの疲れがセルライトの種になりかけています。今から老廃物を流す習慣をつければ、10年後もスッキリとした太ももでいられますよ。",message:"無理なく自分のペースで過ごせていますね。少しのケアが未来の脚を大きく変えてくれますよ。"},
+  "0-0-3":{vision:"毎日のデスクワークで徐々に太もも周辺が固まり始めています。今しっかりほぐして巡りをリセットすれば、10年後の頑固な横張りは確実に防げます。",message:"毎日のお仕事お疲れ様です。頑張りすぎないで、少しだけ脚を伸ばす深呼吸の時間を作ってみてくださいね。"},
+  "0-0-4":{vision:"高いストレスと長時間の座り仕事で、セルライトが非常に硬化しやすい状態です。プロの手で一度リセットし自律神経を整えれば、10年後も軽やかな脚を取り戻せます。",message:"毎日たくさん抱え込んでいませんか？脚の張りはあなたの頑張りの証。どうかご自身を甘やかす時間を作ってあげてください。"},
+  "0-0-5":{vision:"脳の疲労が脚を「鎧」のように硬くしています。今すぐ心身の緊張を解き放つケアを始めれば、10年後は見違えるほどしなやかで巡りの良い脚になりますよ。",message:"限界まで本当によく頑張りましたね。もう自分を後回しにするのは終わりにしましょう。私たちにゆだねてください。"},
+  "0-1-1":{vision:"ストレスは少ないものの、座り姿勢で鼠径部が圧迫され冷えが生じています。今のうちに血流を促すケアを取り入れれば、10年後もぽかぽかと温かい脚を保てます。",message:"穏やかな日々を過ごせていて素晴らしいです。冷えは万病の元、少しだけ温める意識を持ってみてくださいね。"},
+  "0-1-2":{vision:"デスクワークでの血流低下が冷えを招いています。今の段階で芯から温めるアプローチをすれば、10年後も代謝の高いスッキリ脚が叶います。",message:"心に少しのゆとりがある今が、体質改善のベストタイミングです。温かい飲み物でホッと一息ついてくださいね。"},
+  "0-1-3":{vision:"冷えが蓄積し、脂肪が燃えにくい状態になりつつあります。今のうちに熱を生み出す力を呼び覚ませば、10年後も冷え知らずの健康的な脚で過ごせます。",message:"毎日同じ姿勢で頑張っていると、脚先まで冷えてしまいますよね。足首を回すだけでも立派なケアですよ。"},
+  "0-1-4":{vision:"強いストレスで血管が収縮し、デスクワークの圧迫と相まって深刻な冷えを引き起こしています。リラクゼーションと共に深部を温めれば、10年後の未来は明るいです。",message:"緊張状態が続くと、体はどんどん冷えてしまいます。頑張り屋さんのあなたこそ、心まで温まる休息が必要です。"},
+  "0-1-5":{vision:"極度のストレスと冷えが合わさり、脚全体が氷のように固まっています。一刻も早く自律神経を休ませてあげることで、10年後は血色の良い柔らかな脚を取り戻せます。",message:"SOSのサイン、しっかり受け取りました。今は何も考えず、ただただ温かく包み込まれる時間を自分に許してあげてください。"},
+  "0-2-1":{vision:"座り癖による筋膜の癒着が脚痩せを阻害していますが、心身の状態は良好です。適切なほぐしを取り入れるだけで、10年後は全身のバランスが整った美脚になります。",message:"ダイエット成功、本当に素晴らしいです！あとは脚だけ。リラックスして最後の仕上げを楽しみましょう。"},
+  "0-2-2":{vision:"デスクワークでの代償動作が脚の太さを残しています。正しい筋肉の使い方の癖をつければ、10年後もリバウンドのない理想の脚のラインを保てます。",message:"全体が痩せたのはあなたの努力の賜物です。残った脚のお悩みは、私たちプロに少しだけお手伝いさせてくださいね。"},
+  "0-2-3":{vision:"座り姿勢の偏りが下半身の代謝だけを落としています。今から根本的な巡りの改善を行うことで、10年後は「脚が一番のチャームポイント」と言えるようになります。",message:"「脚だけ痩せない」という悔しさ、よくわかります。でも諦めないで。原因はあなたの努力不足ではなく、日常の癖にあります。"},
+  "0-2-4":{vision:"ストレスからくる無意識の力みが、脚だけに筋肉の張りを残しています。心の緊張を解き、癒着を剥がすことで、10年後はスラリとしたモデルのような脚が手に入ります。",message:"気を張る日々の中で、脚もキュッと力んで守ってくれているんです。もう大丈夫、少し肩の力を抜いてみましょう。"},
+  "0-2-5":{vision:"過酷なストレスが自律神経を乱し、脚にだけ「守りの鎧」を作らせています。まずは深い休息をとることで体が安心し、10年後は嘘のようにすっきりした下半身になります。",message:"心が限界を迎えている時、体は必死にバランスを取ろうとします。今はダイエットをお休みして、自分を癒すことを最優先にしてくださいね。"},
+  "1-0-1":{vision:"立ち仕事で重力に負けた水分が一時的に溜まっていますが、ストレスがないため回復は早いです。毎日のリセットケアで、10年後もむくみやセルライトのない脚でいられます。",message:"心穏やかに過ごせている今、お風呂上がりの少しのマッサージで脚は素直にスッキリしてくれますよ。"},
+  "1-0-2":{vision:"立ち仕事の疲労が蓄積し、夕方のむくみがセルライト化し始めています。今のうちに循環を整えれば、10年後もボコボコ感のないなめらかな脚を維持できます。",message:"毎日重力と戦いながら立っている脚に、感謝の気持ちを込めて優しくなでてあげてくださいね。"},
+  "1-0-3":{vision:"長時間の立ち仕事と日常のストレスで、太ももの外側に負荷がかかり張りが出きています。今正しいケアをすれば、10年後も痛みのない美しいラインの脚で歩き続けられます。",message:"夕方の靴がきつくなる不快感、辛いですよね。今日もお疲れ様。脚を高くしてゆっくり休んでください。"},
+  "1-0-4":{vision:"強いストレスと立ちっぱなしの疲労が重なり、老廃物がカチカチのセルライトになりかけています。プロの徹底的なデトックスで、10年後は軽やかに弾むような脚が手に入ります。",message:"心も体もパンパンに張っていませんか？その張りはあなたの頑張りそのもの。どうか私たちに軽くするお手伝いをさせてください。"},
+  "1-0-5":{vision:"極度のストレスと肉体疲労で、脚の筋肉が常に緊張し固太りのセルライトを作っています。まずは心身を究極にリラックスさせることで、10年後は見違えるほど柔らかな美脚になります。",message:"限界を超えて立ち続けているあなたへ。もう自分にムチを打つのはやめて、温かいベッドで泥のように眠る日を作ってください。"},
+  "1-1-1":{vision:"立ち仕事でもストレスが少ないため、冷えは初期段階です。ポンプの役割をするふくらはぎのケアを日常に組み込めば、10年後も芯から温かい代謝の良い脚を保てます。",message:"ご自身のペースで働けていて素晴らしいですね。お風呂でしっかり脚を温めるだけで、さらに軽くなりますよ。"},
+  "1-1-2":{vision:"疲労による筋肉の硬直が血流を妨げ、冷えを生んでいます。今のうちに柔軟性を取り戻せば、10年後も冷房に負けない健康的な脚でいられます。",message:"立ち仕事での冷えは、脚からの「休ませて」というサインです。少しだけ足先を動かして血を巡らせてみましょう。"},
+  "1-1-3":{vision:"夕方からの冷えとむくみが慢性化しつつあります。今、自らの力で熱を生み出せる体に改善すれば、10年後もむくみ知らずの軽やかな脚で生活できます。",message:"毎日立っていると、足先から冷気が上がってくるように感じますよね。温かい靴下で自分を優しく守ってあげてください。"},
+  "1-1-4":{vision:"高いストレスにより交感神経が優位になり、末端の血管が収縮して深刻な冷えを引き起こしています。深いリラクゼーションを取り入れることで、10年後は血流の豊かな温かい脚になります。",message:"気を張ったまま立ち続けるのは、想像以上の負担です。あなたの冷え切った脚も心も、温かく包み込んで溶かしてあげたいです。"},
+  "1-1-5":{vision:"心身の限界が自律神経をフリーズさせ、脚が氷のように冷たく硬直しています。今は休息と温熱ケアを最優先にすることで、10年後は生命力に溢れる柔らかな脚を取り戻せます。",message:"「もう無理かも」という心の声、我慢しないでください。あなたが一番大切にするべきなのは、他の誰でもなくあなた自身です。"},
+  "1-2-1":{vision:"立ち仕事特有の筋肉の使い方が脚の太さを残していますが、心身の状態は良いです。立ち姿勢の重心を整えるだけで、10年後はすらりとしたバランスの良い脚を手に入れられます。",message:"ダイエット大成功ですね！あと一歩、脚のバランスだけです。自分の体を褒めながら、リラックスして仕上げていきましょう。"},
+  "1-2-2":{vision:"長時間の立ち仕事による筋膜の癒着が、脚だけ痩せない原因です。プロの技術で癒着を丁寧に剥がせば、10年後も引き締まった美しい下半身をキープできます。",message:"全体は痩せたのに脚だけ…もどかしいですよね。それはあなたの姿勢の頑張り癖が原因。私たちがしっかりリセットします。"},
+  "1-2-3":{vision:"立ち仕事の疲労で前ももやふくらはぎが張り、そこだけが太く残っています。筋肉の緊張を解くケアを始めれば、10年後はどんな服でも着こなせるスッキリ脚になります。",message:"毎日体重を支えてくれている脚の筋肉が「もっと頑張らなきゃ」と張っている状態です。優しくほぐして安心させてあげましょう。"},
+  "1-2-4":{vision:"ストレスによる力みと立ちっぱなしの負担が、頑固な「鎧」のような筋肉の張りを作っています。心からのリラックスを経験することで、10年後は驚くほど華奢な脚に生まれ変わります。",message:"気を張って立っていると、脚にも無意識に力が入りますよね。もう戦わなくて大丈夫。力を抜くことから始めましょう。"},
+  "1-2-5":{vision:"限界のストレス状態で立ち続けた結果、脚がガチガチに防衛反応を起こしています。すべてを休める時間を作れば体が安心し、10年後は理想通りのほっそりした脚に整います。",message:"これ以上頑張れと言われたら壊れてしまう、そんな状態ですね。ダイエットのことは忘れて、ただただ自分を労わる時間を作ってください。"},
+  "2-0-1":{vision:"動き回る日々で疲労はありますが、ストレスが低いため循環は悪くありません。少しの自分時間でケアを加えれば、10年後も若々しいセルライトのない脚を保てます。",message:"ご家族のための時間の中でも、ご自身の心を大切にできていて素敵です。その延長で、脚のケア時間も作ってみてくださいね。"},
+  "2-0-2":{vision:"不規則な動きと軽いストレスから、骨盤周りに老廃物が溜まり始めています。今のうちにバランスを整えれば、10年後も横張りのないスッキリした下半身でいられます。",message:"毎日パタパタと動き回って、本当にお疲れ様です。少し立ち止まって、自分の脚を愛おしむ時間を持ってみてください。"},
+  "2-0-3":{vision:"家事や抱っこなどの片側重心の癖が、太ももの横張りとセルライトを作っています。今、プロのケアで歪みをリセットすれば、10年後も美しいボディラインで若々しくいられます。",message:"家族優先で自分のことは後回しになりがちですよね。でも、あなたが笑顔でいることが家族の幸せ。自分へのご褒美をあげてください。"},
+  "2-0-4":{vision:"高いストレスと終わりのない家事育児で、体が常に緊張状態になりセルライトが硬化しています。心と体を徹底的に解放すれば、10年後は身軽でしなやかな脚を取り戻せます。",message:"「私さえ我慢すれば」と、一人で抱え込んでいませんか？あなたの脚の張りは、言葉にできないSOSです。どうか私達に頼ってください。"},
+  "2-0-5":{vision:"心身の限界を超えた状態での家事育児が、脚をガチガチの鎧に変えてしまっています。今は何よりも深い休息をとることで、10年後は信じられないほど軽やかな脚と笑顔を取り戻せます。",message:"毎日、息つく暇もないですね。涙が出るほど頑張っているあなたに、今はただ「休んでいいんだよ」と伝えたいです。"},
+  "2-1-1":{vision:"動き回ることで熱は生まれていますが、足元への意識が不足しがちです。日常のちょっとした温めケアを取り入れるだけで、10年後も冷えのない健康的な脚を保てます。",message:"穏やかな気持ちで家族と向き合えている証拠ですね。足首を冷やさない工夫をするだけで、もっと体が楽になりますよ。"},
+  "2-1-2":{vision:"忙しさからくるシャワー浴などが冷えの蓄積を招いています。今の段階で湯船に浸かるなどの温め習慣をつければ、10年後も代謝の良い巡る脚でいられます。",message:"自分の入浴時間はカラスの行水になっていませんか？たまにはゆっくりお湯に浸かって、自分だけの時間を楽しんでくださいね。"},
+  "2-1-3":{vision:"家事育児の疲労と自律神経の軽い乱れが、慢性的な冷えを引き起こしています。今根本的な体質改善を行えば、10年後も内側から輝くような温かい脚で過ごせます。",message:"バタバタと動き回っているのに、脚先は氷のように冷たい…それは体が疲れているサインです。少しペースダウンしてみましょう。"},
+  "2-1-4":{vision:"高いストレスにより交感神経が働き続け、血流が内臓に集中するため極端な末端冷えが起きています。究極のリラックスで副交感神経を優位にすれば、10年後は温かく柔らかな脚を取り戻せます。",message:"24時間気を張っているお母さんの体は、ずっと戦闘モードです。温かい手で丁寧にケアして、安心させてあげたいです。"},
+  "2-1-5":{vision:"限界のストレス状態が自律神経を完全に乱し、脚が芯から凍え切っています。まずはすべてを手放して深い休息と温熱ケアをすれば、10年後は生命力にあふれた温かい体になります。",message:"自分を犠牲にしてまで頑張らないでください。あなたの心と体の冷えを溶かす場所が、ここにはあります。頼ってくださいね。"},
+  "2-2-1":{vision:"家事育児の不規則な姿勢が脚のラインを崩していますが、ストレスが低いため改善はスムーズです。正しい骨盤の位置を覚えれば、10年後も全体のバランスが取れた美脚でいられます。",message:"忙しい中でもダイエットを成功させたこと、本当に尊敬します！最後の仕上げはプロに任せて、リラックスしてください。"},
+  "2-2-2":{vision:"抱っこや家事の偏った筋肉の使い方が、特定の部位の太さを残しています。癒着を剥がして姿勢をリセットすれば、10年後もパンツスタイルが似合うスッキリ脚を保てます。",message:"「なぜ脚だけ？」と悩まないで。それはあなたが毎日家族のために動いている証拠の筋肉です。美しく整えていきましょう。"},
+  "2-2-3":{vision:"終わりのない家事の疲労と負担が脚の筋肉を張らせ、そこだけ痩せない状態を作っています。プロのケアで根本からほぐせば、10年後は全身がしなやかなモデルのような体型になります。",message:"自分の体に目を向ける余裕もない中、ここまで痩せたのはすごいことです。残った脚のお悩みは、一人で抱え込まずご相談ください。"},
+  "2-2-4":{vision:"高いストレスと肉体疲労で、脚の筋肉が「これ以上痩せたら体を支えられない」と防衛反応を起こしています。心からの休息を与えれば、10年後は驚くほど華奢で真っ直ぐな脚になります。",message:"気を張り詰めた毎日に、体も必死に耐えています。もう戦わなくて大丈夫。力を抜いて、自分のためだけの時間を過ごしてください。"},
+  "2-2-5":{vision:"心身の限界からくる無意識の極度の力みが、脚を硬い鎧のように太く残しています。すべてを休めて体を安心させてあげることで、10年後は本来の美しいあなた自身の脚に生まれ変わります。",message:"限界まで頑張るお母さん、本当にお疲れ様です。今は結果を焦らず、ただただ自分を甘やかして大切にする日を作ってください。"}
+};
 
-            const lifeStyles = ["デスクワーク中心", "立ち仕事中心", "家事・育児中心"];
-            const worries = ["セルライト・横の張り", "冷えが酷い", "脚だけ痩せない"];
-            const stressLabels = ["穏やか", "低い", "普通", "高い", "限界"];
+function diagnose() {
+  const ls = document.getElementById('lifestyle').value;
+  const wr = document.getElementById('worry').value;
+  const st = document.getElementById('stress').value;
+  const data = db[`${ls}-${wr}-${st}`] || db["0-0-1"];
+  const panel = document.getElementById('rightPanel');
 
-            useEffect(() => {
-                const ctx = document.getElementById('evolutionChart')?.getContext('2d');
-                if (ctx && !chartRef.current) {
-                    chartRef.current = new Chart(ctx, {
-                        type: 'radar',
-                        data: {
-                            labels: ['純粋な脂肪', '巡り', '芯の冷え', 'ストレス', 'デジタル疲労', '筋膜'],
-                            datasets: [
-                                { label: '1980年代', data: [90, 60, 40, 20, 5, 30], borderColor: '#d6bfa0', fill: true },
-                                { label: '現代', data: [50, 90, 95, 90, 100, 80], borderColor: '#1a2a40', fill: true }
-                            ]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false } } } }
-                    });
-                }
-            }, []);
+  panel.innerHTML = '<div class="loader"><div class="spinner"></div><span>🔮 解析中...</span></div>';
 
-            const startDiagnosis = () => {
-                setIsLoading(true);
-                setResult(null);
-                setTimeout(() => {
-                    const key = `${lifeStyleIdx}-${mainWorryIdx}-${stressLevel > 3 ? 5 : 1}`; // デモ用に1か5に振り分け
-                    setResult(diagnosisDatabase[key] || diagnosisDatabase["0-0-1"]);
-                    setIsLoading(false);
-                }, 1500);
-            };
-
-            return (
-                <div className="bg-[#fdfbf7] min-h-screen text-[#3d2e1f]">
-                    <nav className="p-4 bg-white shadow-sm flex justify-between items-center">
-                        <span className="font-serif font-bold">創業44周年 脚やせ診断</span>
-                        <button className="bg-[#1a2a40] text-white px-4 py-2 rounded-full text-xs">無料体験</button>
-                    </nav>
-
-                    <header className="py-12 text-center">
-                        <h1 className="text-3xl font-serif font-bold text-[#b5945d]">脚が変われば、人生が変わる。</h1>
-                    </header>
-
-                    <main className="max-w-4xl mx-auto p-6 bg-white rounded-3xl shadow-xl border border-[#e1d4bc] grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-bold mb-2">生活習慣</label>
-                                <select className="w-full p-3 border rounded-xl" onChange={e => setLifeStyleIdx(e.target.value)}>
-                                    {lifeStyles.map((s, i) => <option key={i} value={i}>{s}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold mb-2">ストレス度: {stressLabels[stressLevel-1]}</label>
-                                <input type="range" min="1" max="5" value={stressLevel} onChange={e => setStressLevel(e.target.value)} className="w-full accent-[#b5945d]" />
-                            </div>
-                            <button onClick={startDiagnosis} className="w-full bg-[#1a2a40] text-white py-4 rounded-xl font-bold shadow-lg">
-                                {isLoading ? "解析中..." : "未来を診断する"}
-                            </button>
-                        </div>
-
-                        <div className="flex flex-col items-center justify-center min-h-[300px] border-l border-gray-100 pl-8">
-                            {result ? (
-                                <div className="space-y-4 animate-pulse">
-                                    <img src={result.imageUrl} className="rounded-xl shadow-md" />
-                                    <h4 className="font-bold text-[#b5945d]">🔮 10年後の未来予測</h4>
-                                    <p className="text-sm">{result.vision}</p>
-                                    <div className="p-4 bg-[#1a2a40] text-white rounded-lg text-sm italic">{result.message}</div>
-                                </div>
-                            ) : (
-                                <div className="w-full h-64"><canvas id="evolutionChart"></canvas></div>
-                            )}
-                        </div>
-                    </main>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+  setTimeout(() => {
+    panel.innerHTML = `
+      <div class="result">
+        <p class="result-tag">🔮 10年後の未来予測</p>
+        <div class="result-vision">${data.vision}</div>
+        <div class="result-message">💬 ${data.message}</div>
+        <div class="result-cta">
+          <p>この結果を改善するには？</p>
+          <button class="cta-btn">無料カウンセリングを予約</button>
+        </div>
+      </div>`;
+  }, 1400);
+}
+</script>
 </body>
 </html>
