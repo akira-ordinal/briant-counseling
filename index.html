@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創業44周年 脚やせ未来診断</title>
+    <!-- Tailwind CSS (スタイリング用) -->
+    <script src="https://tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <!-- Babel (JSXをブラウザで動かすため) -->
+    <script src="https://unpkg.com"></script>
+    <!-- Chart.js -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        @import url('https://googleapis.com');
+        .font-serif { font-family: 'Noto Serif JP', serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 診断データベース ---
+        const diagnosisDatabase = {
+            "0-0-1": {
+                vision: "現在は低ストレスですが、座りっぱなしの習慣が続くと10年後には筋膜が癒着し、脚のラインが外側に張り出す可能性があります。今のうちから巡りを整えましょう。",
+                message: "自分を大切にできている今の状態をキープして、理想の脚を目指しましょう。",
+                imageUrl: "https://unsplash.com"
+            },
+            "0-0-5": {
+                vision: "限界に近いストレスとデスクワークの蓄積は、10年後の深刻なむくみと「冷え太り」を招く恐れがあります。脳疲労をリセットし、脚を解放してあげることが最優先です。",
+                message: "毎日本当にお疲れ様です。たまには自分を「一番」にして、心と体を甘やかしてあげてください。",
+                imageUrl: "https://unsplash.com"
+            },
+            // ここにAIに作らせた他の43パターンをどんどん追加できます
+        };
+
+        const App = () => {
+            const [lifeStyleIdx, setLifeStyleIdx] = useState(0);
+            const [mainWorryIdx, setMainWorryIdx] = useState(0);
+            const [stressLevel, setStressLevel] = useState(3);
+            const [isLoading, setIsLoading] = useState(false);
+            const [result, setResult] = useState(null);
+            const chartRef = useRef(null);
+
+            const lifeStyles = ["デスクワーク中心", "立ち仕事中心", "家事・育児中心"];
+            const worries = ["セルライト・横の張り", "冷えが酷い", "脚だけ痩せない"];
+            const stressLabels = ["穏やか", "低い", "普通", "高い", "限界"];
+
+            useEffect(() => {
+                const ctx = document.getElementById('evolutionChart')?.getContext('2d');
+                if (ctx && !chartRef.current) {
+                    chartRef.current = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: ['純粋な脂肪', '巡り', '芯の冷え', 'ストレス', 'デジタル疲労', '筋膜'],
+                            datasets: [
+                                { label: '1980年代', data: [90, 60, 40, 20, 5, 30], borderColor: '#d6bfa0', fill: true },
+                                { label: '現代', data: [50, 90, 95, 90, 100, 80], borderColor: '#1a2a40', fill: true }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false } } } }
+                    });
+                }
+            }, []);
+
+            const startDiagnosis = () => {
+                setIsLoading(true);
+                setResult(null);
+                setTimeout(() => {
+                    const key = `${lifeStyleIdx}-${mainWorryIdx}-${stressLevel > 3 ? 5 : 1}`; // デモ用に1か5に振り分け
+                    setResult(diagnosisDatabase[key] || diagnosisDatabase["0-0-1"]);
+                    setIsLoading(false);
+                }, 1500);
+            };
+
+            return (
+                <div className="bg-[#fdfbf7] min-h-screen text-[#3d2e1f]">
+                    <nav className="p-4 bg-white shadow-sm flex justify-between items-center">
+                        <span className="font-serif font-bold">創業44周年 脚やせ診断</span>
+                        <button className="bg-[#1a2a40] text-white px-4 py-2 rounded-full text-xs">無料体験</button>
+                    </nav>
+
+                    <header className="py-12 text-center">
+                        <h1 className="text-3xl font-serif font-bold text-[#b5945d]">脚が変われば、人生が変わる。</h1>
+                    </header>
+
+                    <main className="max-w-4xl mx-auto p-6 bg-white rounded-3xl shadow-xl border border-[#e1d4bc] grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-bold mb-2">生活習慣</label>
+                                <select className="w-full p-3 border rounded-xl" onChange={e => setLifeStyleIdx(e.target.value)}>
+                                    {lifeStyles.map((s, i) => <option key={i} value={i}>{s}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold mb-2">ストレス度: {stressLabels[stressLevel-1]}</label>
+                                <input type="range" min="1" max="5" value={stressLevel} onChange={e => setStressLevel(e.target.value)} className="w-full accent-[#b5945d]" />
+                            </div>
+                            <button onClick={startDiagnosis} className="w-full bg-[#1a2a40] text-white py-4 rounded-xl font-bold shadow-lg">
+                                {isLoading ? "解析中..." : "未来を診断する"}
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center min-h-[300px] border-l border-gray-100 pl-8">
+                            {result ? (
+                                <div className="space-y-4 animate-pulse">
+                                    <img src={result.imageUrl} className="rounded-xl shadow-md" />
+                                    <h4 className="font-bold text-[#b5945d]">🔮 10年後の未来予測</h4>
+                                    <p className="text-sm">{result.vision}</p>
+                                    <div className="p-4 bg-[#1a2a40] text-white rounded-lg text-sm italic">{result.message}</div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-64"><canvas id="evolutionChart"></canvas></div>
+                            )}
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
